@@ -1,0 +1,20 @@
+.evaluation-container {
+    width: 40px;
+    height: 720px;
+
+    background: red;
+    border: 4px solid yellow;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.evaluation-black {
+    flex: 1;
+    background: blue;
+}
+
+.evaluation-white {
+    flex: 1;
+    background: lime;
+}
