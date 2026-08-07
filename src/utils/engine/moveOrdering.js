@@ -4,15 +4,26 @@ export function orderMoves(board, moves) {
 
     return [...moves].sort((a, b) => {
 
-        const scoreA = moveScore(board, a);
-        const scoreB = moveScore(board, b);
+        const scoreA = moveScore(
+            board,
+            a
+        );
+
+        const scoreB = moveScore(
+            board,
+            b
+        );
 
         return scoreB - scoreA;
+
     });
 
 }
 
-function moveScore(board, currentMove) {
+function moveScore(
+    board,
+    currentMove
+) {
 
     let score = 0;
 
@@ -22,20 +33,33 @@ function moveScore(board, currentMove) {
     const capturedPiece =
         board[currentMove.toRow][currentMove.toCol];
 
-    // MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
+    // ==========================
+    // MVV-LVA
+    // ==========================
 
     if (capturedPiece) {
 
         score +=
             10 * PIECE_VALUES[capturedPiece.type] -
             PIECE_VALUES[movingPiece.type];
+
     }
 
+    // ==========================
     // Promotion
+    // ==========================
 
     if (currentMove.move?.promotion) {
+
         score += 800;
+
     }
 
+    // ==========================
+    // History Heuristic
+    // ==========================
+;
+
     return score;
+
 }

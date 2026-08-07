@@ -6,7 +6,7 @@ export function makeMove(
     lastMove
 ) {
 
-    return search(
+    return iterativeDeepening(
         board,
         color,
         lastMove

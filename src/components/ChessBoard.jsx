@@ -28,7 +28,7 @@ import { search } from "../utils/engine/search";
 
 import { createInitialBoard } from "../utils/constants";
 
-function ChessBoard({ game }) {
+function ChessBoard({ game, playerColor, flipped, difficulty }) {
 
     const {
 
@@ -73,9 +73,6 @@ function ChessBoard({ game }) {
 
         lastMove,
         setLastMove,
-
-        flipped,
-        setFlipped,
 
         queenRevived,
         setQueenRevived,
@@ -824,10 +821,17 @@ function ChessBoard({ game }) {
     }
     function makeBotMove(currentBoard) {
 
+        const botColor =
+            playerColor === "w"
+                ? "b"
+                : "w";
+
         const bestMove = search(
             currentBoard,
-            "b",
-            lastMove
+            botColor,
+            lastMove,
+            difficulty,
+            moveHistory.length
         );
 
         if (!bestMove) return;
@@ -840,7 +844,7 @@ function ChessBoard({ game }) {
     }
     useEffect(() => {
 
-        if (turn !== "b") return;
+        if (turn === playerColor) return;
 
         if (gameOver) return;
 
@@ -888,7 +892,7 @@ function ChessBoard({ game }) {
         if (gameOver) return;
 
         // In Bot Mode, the player only controls White
-        if (turn === "b") return;
+        if (turn !== playerColor) return;
 
         // ==========================
         // Move a selected piece

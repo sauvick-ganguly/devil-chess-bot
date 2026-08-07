@@ -1,31 +1,34 @@
 import { generateLegalMoves } from "./moveGenerator";
-import { minimax } from "./minimax";
+import { alphaBeta } from "./alphaBeta";
+import { orderMoves } from "./moveOrdering";
 import { applyMove } from "../gameLogic";
 
-const SEARCH_DEPTH = 2;
+const TOLERANCE = 15;
 
 export function search(
     board,
     color,
-    lastMove
+    lastMove,
+    depth,
+    moveNumber
 ) {
-    console.log("Search started");
-    const legalMoves = generateLegalMoves(
+
+    let legalMoves = generateLegalMoves(
         board,
         color,
         lastMove
+    );
+
+    legalMoves = orderMoves(
+        board,
+        legalMoves
     );
 
     if (legalMoves.length === 0) {
         return null;
     }
 
-    let bestMove = null;
-
-    let bestEvaluation =
-        color === "w"
-            ? -Infinity
-            : Infinity;
+    const scoredMoves = [];
 
     for (const currentMove of legalMoves) {
 
@@ -37,38 +40,67 @@ export function search(
             currentMove.toCol,
             currentMove.move
         );
-        console.log("Before minimax");
-        const evaluation = minimax(
+
+        const evaluation = alphaBeta(
             newBoard,
-            SEARCH_DEPTH - 1,
+            depth - 1,
+            -Infinity,
+            Infinity,
             color === "b",
             currentMove.move
         );
-        console.log("After minimax");
-        if (color === "w") {
 
-            if (evaluation > bestEvaluation) {
-
-                bestEvaluation = evaluation;
-                bestMove = currentMove;
-
-            }
-
-        }
-
-        else {
-
-            if (evaluation < bestEvaluation) {
-
-                bestEvaluation = evaluation;
-                bestMove = currentMove;
-
-            }
-
-        }
+        scoredMoves.push({
+            move: currentMove,
+            evaluation
+        });
 
     }
 
-    return bestMove;
+    scoredMoves.sort((a, b) =>
+
+        color === "w"
+            ? b.evaluation - a.evaluation
+            : a.evaluation - b.evaluation
+
+    );
+
+    // FIRST MOVE ONLY
+    if (moveNumber === 0) {
+
+        const topMoves = scoredMoves.slice(
+            0,
+            Math.min(6, scoredMoves.length)
+        );
+
+        return topMoves[
+            Math.floor(
+                Math.random() * topMoves.length
+            )
+        ].move;
+
+    }
+
+    let bestEvaluation = scoredMoves[0].evaluation;
+
+    const bestMoves = scoredMoves.filter(move =>
+
+        Math.abs(
+            move.evaluation - bestEvaluation
+        ) <= TOLERANCE
+
+    );
+
+    if (moveNumber < 8) {
+
+        return bestMoves[
+            Math.floor(
+                Math.random() * bestMoves.length
+            )
+        ].move;
+
+    }
+
+    return scoredMoves[0].move;
 
 }

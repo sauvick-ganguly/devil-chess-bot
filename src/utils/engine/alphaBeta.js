@@ -3,10 +3,21 @@ import { generateLegalMoves } from "./moveGenerator";
 import { applyMove } from "../gameLogic";
 import { orderMoves } from "./moveOrdering";
 import { boardHash } from "./positionHash";
+import { quiescence } from "./quiescence";
 import {
     getTT,
     storeTT
 } from "./transpositionTable";
+
+let nodes = 0;
+
+export function resetNodes() {
+    nodes = 0;
+}
+
+export function getNodes() {
+    return nodes;
+}
 
 export function alphaBeta(
     board,
@@ -16,6 +27,9 @@ export function alphaBeta(
     maximizingPlayer,
     lastMove
 ) {
+
+    nodes++;
+
     const key = boardHash(board);
 
     const cached = getTT(key);
@@ -27,10 +41,28 @@ export function alphaBeta(
         return cached.score;
     }
 
+    // ==========================
     // Base Case
+    // ==========================
+
     if (depth === 0) {
-        return evaluatePosition(board, lastMove);
+
+        return quiescence(
+            board,
+            alpha,
+            beta,
+            maximizingPlayer,
+            lastMove
+        );
+
+        // For testing:
+        // return evaluatePosition(board, lastMove);
+
     }
+
+    // ==========================
+    // White (Maximizing)
+    // ==========================
 
     if (maximizingPlayer) {
 
@@ -42,10 +74,16 @@ export function alphaBeta(
             lastMove
         );
 
-        moves = orderMoves(board, moves);
+        moves = orderMoves(
+            board,
+            moves
+        );
 
         if (moves.length === 0) {
-            return evaluatePosition(board, lastMove);
+            return evaluatePosition(
+                board,
+                lastMove
+            );
         }
 
         for (const currentMove of moves) {
@@ -68,15 +106,20 @@ export function alphaBeta(
                 currentMove.move
             );
 
-            maxEval = Math.max(maxEval, evaluation);
+            if (evaluation > maxEval) {
+                maxEval = evaluation;
+            }
 
-            alpha = Math.max(alpha, evaluation);
+            if (evaluation > alpha) {
+                alpha = evaluation;
+            }
 
             if (beta <= alpha) {
                 break;
             }
 
         }
+
         storeTT(
             key,
             depth,
@@ -87,60 +130,70 @@ export function alphaBeta(
 
     }
 
-    else {
+    // ==========================
+    // Black (Minimizing)
+    // ==========================
 
-        let minEval = Infinity;
+    let minEval = Infinity;
 
-        let moves = generateLegalMoves(
+    let moves = generateLegalMoves(
+        board,
+        "b",
+        lastMove
+    );
+
+    moves = orderMoves(
+        board,
+        moves
+    );
+
+    if (moves.length === 0) {
+        return evaluatePosition(
             board,
-            "b",
             lastMove
         );
+    }
 
-        moves = orderMoves(board, moves);
+    for (const currentMove of moves) {
 
-        if (moves.length === 0) {
-            return evaluatePosition(board, lastMove);
-        }
-
-        for (const currentMove of moves) {
-
-            const newBoard = applyMove(
-                board,
-                currentMove.fromRow,
-                currentMove.fromCol,
-                currentMove.toRow,
-                currentMove.toCol,
-                currentMove.move
-            );
-
-            const evaluation = alphaBeta(
-                newBoard,
-                depth - 1,
-                alpha,
-                beta,
-                true,
-                currentMove.move
-            );
-
-            minEval = Math.min(minEval, evaluation);
-
-            beta = Math.min(beta, evaluation);
-
-            if (beta <= alpha) {
-                break;
-            }
-
-        }
-
-        storeTT(
-            key,
-            depth,
-            minEval
+        const newBoard = applyMove(
+            board,
+            currentMove.fromRow,
+            currentMove.fromCol,
+            currentMove.toRow,
+            currentMove.toCol,
+            currentMove.move
         );
 
-        return minEval;
+        const evaluation = alphaBeta(
+            newBoard,
+            depth - 1,
+            alpha,
+            beta,
+            true,
+            currentMove.move
+        );
+
+        if (evaluation < minEval) {
+            minEval = evaluation;
+        }
+
+        if (evaluation < beta) {
+            beta = evaluation;
+        }
+
+        if (beta <= alpha) {
+            break;
+        }
 
     }
+
+    storeTT(
+        key,
+        depth,
+        minEval
+    );
+
+    return minEval;
 
 }

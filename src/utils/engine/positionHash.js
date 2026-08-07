@@ -1,6 +1,8 @@
+import { zobristTable } from "./zobrist";
+
 export function boardHash(board) {
 
-    let hash = "";
+    let hash = 0;
 
     for (let row = 0; row < 8; row++) {
 
@@ -8,22 +10,23 @@ export function boardHash(board) {
 
             const piece = board[row][col];
 
-            if (!piece) {
-                hash += ".";
-                continue;
+            if (!piece) continue;
+
+            const key =
+                piece.color + piece.type;
+
+            hash ^= zobristTable[key][row][col];
+
+            if (piece.revived) {
+
+                hash ^= 0x9e3779b9;
+
             }
-
-            hash +=
-                piece.color +
-                piece.type;
-
-            if (piece.revived)
-                hash += "R";
 
         }
 
     }
 
-    return hash;
+    return hash >>> 0;
 
 }

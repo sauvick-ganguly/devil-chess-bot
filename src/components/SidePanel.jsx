@@ -32,7 +32,7 @@ const symbols = {
         D: blackDevilPrelate,
     },
 };
-function SidePanel({ game }) {
+function SidePanel({ game, difficulty }) {
 
     const [showMoveHistory, setShowMoveHistory] = useState(false);
     const {
@@ -42,8 +42,6 @@ function SidePanel({ game }) {
         moveHistory,
         undoStack,
         handleUndo,
-        flipped,
-        setFlipped,
     } = game;
 
     return (
@@ -203,15 +201,15 @@ function SidePanel({ game }) {
                         capturedByBlack.map((piece, index) => (
 
                             <img
-                                    className="captured-piece"
-                                    src={symbols[piece.color][piece.type]}
-                                    alt={piece.type}
-                                    style={{
-                                        width: "24px",
-                                        height: "24px",
-                                        objectFit: "contain"
-                                    }}
-                                />
+                                className="captured-piece"
+                                src={symbols[piece.color][piece.type]}
+                                alt={piece.type}
+                                style={{
+                                    width: "24px",
+                                    height: "24px",
+                                    objectFit: "contain"
+                                }}
+                            />
 
                         ))
 
@@ -324,40 +322,30 @@ function SidePanel({ game }) {
                     gap: "10px",
                 }}
             >
-                <button
-                    className="undo-btn"
-                    onClick={handleUndo}
-                    disabled={undoStack.length === 0}
-                    style={{
-                        fontFamily: "'UnifrakturCook', cursive",
-                        fontSize: "18px",
-                        color: "#D4AF37",
-                        textShadow: "0 0 8px rgba(0,0,0,0.8)",
-                    }}
-                >
-                    Undo
-                </button>
+                {difficulty < 3 && (
+                    <button
+                        className="undo-btn"
+                        onClick={handleUndo}
+                        disabled={undoStack.length === 0}
+                        style={{
+                            fontFamily: "'UnifrakturCook', cursive",
+                            fontSize: "18px",
+                            color: "#D4AF37",
+                            textShadow: "0 0 8px rgba(0,0,0,0.8)",
+                        }}
+                    >
+                        Undo
+                    </button>
+                )}
 
-                <button
-                    className="undo-btn"
-                    onClick={() => setFlipped(prev => !prev)}
-                    style={{
-                        fontFamily: "'UnifrakturCook', cursive",
-                        fontSize: "18px",
-                        color: "#D4AF37",
-                        textShadow: "0 0 8px rgba(0,0,0,0.8)",
-                    }}
-                >
-                    Flip Board
-                </button>
             </div>
-            
-            
+
+
         </div>
-        
+
     );
-    
-    
+
+
 }
 
 export default SidePanel;

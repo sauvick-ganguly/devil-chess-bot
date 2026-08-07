@@ -33,8 +33,6 @@ function useGame() {
 
     const [lastMove, setLastMove] = useState(null);
 
-    const [flipped, setFlipped] = useState(false);
-
     const [animatingMove, setAnimatingMove] = useState(null);
 
     const [queenRevived, setQueenRevived] = useState({
@@ -180,9 +178,6 @@ function useGame() {
 
         lastMove,
         setLastMove,
-
-        flipped,
-        setFlipped,
 
         animatingMove,
         setAnimatingMove,
