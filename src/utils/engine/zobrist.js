@@ -4,12 +4,14 @@ const PIECES = [
     "wW",
     "wD",
     "wK",
+    "wQ",
 
     "bP",
     "bR",
     "bW",
     "bD",
     "bK",
+    "bQ",
 ];
 
 const zobristTable = {};
@@ -25,12 +27,12 @@ for (const piece of PIECES) {
         for (let col = 0; col < 8; col++) {
 
             zobristTable[piece][row][col] =
-                Math.floor(Math.random() * 0xffffffff);
+                Math.floor(
+                    Math.random() * 0xffffffff
+                );
 
         }
-
     }
-
 }
 
 export { zobristTable };
