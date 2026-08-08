@@ -1,4 +1,4 @@
-
+import botBattleLogo from "../assets/bots.png";
 
 function BotSetup({
   playerColor,
@@ -27,18 +27,43 @@ function BotSetup({
       }}
     >
 
-      <h1
+      {/* BOT BATTLE TITLE + IMAGE */}
+      <div
         style={{
-          fontSize: "52px",
-          letterSpacing: "4px",
-          marginBottom: "30px",
-          color: "#D4AF37",
-          textShadow:
-            "0 0 15px rgba(212, 175, 55, 0.5)"
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "20px",
+          marginBottom: "30px"
         }}
       >
-        BOT BATTLE
-      </h1>
+        <img
+          src={botBattleLogo}
+          alt="Bot Battle"
+          style={{
+            width: "75px",
+            height: "75px",
+            objectFit: "contain",
+            filter:
+              "drop-shadow(0 0 10px rgba(212, 175, 55, 0.5))"
+          }}
+        />
+
+        <h1
+          style={{
+            fontSize: "52px",
+            letterSpacing: "4px",
+            margin: 0,
+            color: "#D4AF37",
+            textShadow:
+              "0 0 15px rgba(212, 175, 55, 0.5)"
+          }}
+        >
+          BOT BATTLE
+        </h1>
+
+
+      </div>
 
       <h2
         style={{
@@ -56,11 +81,7 @@ function BotSetup({
       <div className="selection-group">
 
         <button
-          className={
-            playerColor === "w"
-              ? "selected"
-              : ""
-          }
+          className={playerColor === "w" ? "selected" : ""}
           onClick={() => setPlayerColor("w")}
         >
           <span
@@ -77,11 +98,7 @@ function BotSetup({
         </button>
 
         <button
-          className={
-            playerColor === "b"
-              ? "selected"
-              : ""
-          }
+          className={playerColor === "b" ? "selected" : ""}
           onClick={() => setPlayerColor("b")}
         >
           <span
@@ -115,11 +132,7 @@ function BotSetup({
 
         <button
           disabled={!playerColor}
-          className={
-            difficulty === 1
-              ? "selected"
-              : ""
-          }
+          className={difficulty === 1 ? "selected" : ""}
           onClick={() => setDifficulty(1)}
         >
           Easy
@@ -127,11 +140,7 @@ function BotSetup({
 
         <button
           disabled={!playerColor}
-          className={
-            difficulty === 2
-              ? "selected"
-              : ""
-          }
+          className={difficulty === 2 ? "selected" : ""}
           onClick={() => setDifficulty(2)}
         >
           Medium
@@ -139,11 +148,7 @@ function BotSetup({
 
         <button
           disabled={!playerColor}
-          className={
-            difficulty === 3
-              ? "selected"
-              : ""
-          }
+          className={difficulty === 3 ? "selected" : ""}
           onClick={() => setDifficulty(3)}
         >
           Hard (Beta Version)
