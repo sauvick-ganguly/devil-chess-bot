@@ -1,4 +1,4 @@
-import { evaluatePosition } from "../evaluation/evaluation";
+import { evaluatePositionForSearch } from "../ml/evaluationMode";
 import { generateLegalMoves } from "./moveGenerator";
 import { applyMove } from "../gameLogic";
 import { orderMoves } from "./moveOrdering";
@@ -80,7 +80,7 @@ export function alphaBeta(
         );
 
         if (moves.length === 0) {
-            return evaluatePosition(
+            return evaluatePositionForSearch(
                 board,
                 lastMove
             );
@@ -148,7 +148,7 @@ export function alphaBeta(
     );
 
     if (moves.length === 0) {
-        return evaluatePosition(
+        return evaluatePositionForSearch(
             board,
             lastMove
         );

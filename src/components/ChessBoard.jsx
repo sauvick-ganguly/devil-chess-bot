@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import {
+    resetNodes,
+    getNodes
+} from "../utils/engine/alphaBeta";
 import Square from "./Square";
 import Piece from "./Piece";
 import GameOverModal from "./GameOverModal";
@@ -8,6 +12,7 @@ import AnimatedPiece from "./AnimatedPiece";
 import whiteWolf from "../assets/white/whiteWolf.png";
 import blackWolf from "../assets/black/blackWolf.png";
 import { generateLegalMoves } from "../utils/engine/moveGenerator";
+import { downloadTrainingData } from "../utils/ml/generateTrainingData";
 
 import {
     toChessSquare,
@@ -29,6 +34,55 @@ import { search } from "../utils/engine/search";
 import { createInitialBoard } from "../utils/constants";
 
 function ChessBoard({ game, playerColor, flipped, difficulty }) {
+
+    function benchmarkEvaluation() {
+        const depth = 3;
+        const moveNumber = 10;
+
+        // Test the original evaluator.
+        setMLEvaluation(false);
+        resetNodes();
+
+        let start = performance.now();
+
+        search(board, turn, lastMove, depth, moveNumber);
+
+        const baselineMs = performance.now() - start;
+        const baselineNodes = getNodes();
+
+        // Test the Random Forest evaluator.
+        setMLEvaluation(true);
+        resetNodes();
+
+        start = performance.now();
+
+        search(board, turn, lastMove, depth, moveNumber);
+
+        const mlMs = performance.now() - start;
+        const mlNodes = getNodes();
+
+        // Restore the original evaluator.
+        setMLEvaluation(false);
+
+        console.table([
+            {
+                Evaluator: "Original",
+                "Time (ms)": baselineMs.toFixed(2),
+                Nodes: baselineNodes
+            },
+            {
+                Evaluator: "Random Forest",
+                "Time (ms)": mlMs.toFixed(2),
+                Nodes: mlNodes
+            }
+        ]);
+
+        console.log(
+            "Speed improvement:",
+            `${((baselineMs - mlMs) / baselineMs * 100).toFixed(1)}%`
+        );
+    }
+
 
     const {
 
@@ -819,29 +873,39 @@ function ChessBoard({ game, playerColor, flipped, difficulty }) {
         }
 
     }
-    function makeBotMove(currentBoard) {
+   
+function makeBotMove(currentBoard) {
+    const botColor = playerColor === "w" ? "b" : "w";
 
-        const botColor =
-            playerColor === "w"
-                ? "b"
-                : "w";
+    // Map the difficulty setting to the actual search depth
+    const difficultyDepth = {
+        1: 2,  // Easy
+        2: 3,  // Medium
+        3: 4,  // Hard
+    };
 
-        const bestMove = search(
-            currentBoard,
-            botColor,
-            lastMove,
-            difficulty,
-            moveHistory.length
-        );
+    const searchDepth = difficultyDepth[difficulty] ?? 3;
 
-        if (!bestMove) return;
+    console.log("Bot difficulty:", difficulty);
+    console.log("Bot search depth:", searchDepth);
 
-        executeMove(
-            bestMove.fromRow,
-            bestMove.fromCol,
-            bestMove.move
-        );
-    }
+    const bestMove = search(
+        currentBoard,
+        botColor,
+        lastMove,
+        searchDepth,
+        moveHistory.length
+    );
+
+    if (!bestMove) return;
+
+    executeMove(
+        bestMove.fromRow,
+        bestMove.fromCol,
+        bestMove.move
+    );
+}
+
     useEffect(() => {
 
         if (turn === playerColor) return;
@@ -1073,7 +1137,9 @@ function ChessBoard({ game, playerColor, flipped, difficulty }) {
                 onSelect={handlePromotion}
             />
 
+
         </div>
+
     );
 
 }

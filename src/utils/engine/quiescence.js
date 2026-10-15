@@ -1,4 +1,4 @@
-import { evaluatePosition } from "../evaluation/evaluation";
+import { evaluatePositionForSearch } from "../ml/evaluationMode";
 import { generateLegalMoves } from "./moveGenerator";
 import { applyMove } from "../gameLogic";
 
@@ -10,7 +10,7 @@ export function quiescence(
     lastMove
 ) {
 
-    const standPat = evaluatePosition(
+    const standPat = evaluatePositionForSearch(
         board,
         lastMove
     );
